@@ -1,50 +1,82 @@
 <!DOCTYPE html>
-<script>
-const URL_DATOS = "https://script.google.com/macros/s/AKfycbzXlQrv975JiOA6J5-wsxQs-UkHRAwNxIqdC8tvnADvvRxCYAi8USOVCct9jOJxPi2ZiQ/exec";
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gráfica desde Google Sheets</title>
 
-fetch(URL_DATOS)
-  .then(res => res.json())
-  .then(data => {
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    // 1️⃣ Contar ciudadanos por código postal
-    const conteoCP = {};
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 800px;
+      margin: auto;
+    }
+  </style>
+</head>
 
-    data.forEach(item => {
-      const cp = item.CODIGO_POSTAL_CIUDADANO;
-      if (cp) {
-        conteoCP[cp] = (conteoCP[cp] || 0) + 1;
-      }
-    });
+<body>
 
-    // 2️⃣ Preparar datos para la gráfica
-    const labels = Object.keys(conteoCP);
-    const valores = Object.values(conteoCP);
+  <div class="card">
+    <h2>Ciudadanos por Código Postal</h2>
+    <canvas id="myChart"></canvas>
+  </div>
 
-    const ctx = document.getElementById("myChart").getContext("2d");
+  <script>
+    const URL_DATOS = "https://script.google.com/macros/s/AKfycbzXlQrv975JiOA6J5-wsxQs-UkHRAwNxIqdC8tvnADvvRxCYAi8USOVCct9jOJxPi2ZiQ/exec";
 
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: "Ciudadanos por Código Postal",
-          data: valores,
-          backgroundColor: "rgba(54, 162, 235, 0.6)"
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1
+    fetch(URL_DATOS)
+      .then(res => res.json())
+      .then(data => {
+
+        const conteoCP = {};
+
+        data.forEach(item => {
+          const cp = item.CODIGO_POSTAL_CIUDADANO;
+          if (cp) {
+            conteoCP[cp] = (conteoCP[cp] || 0) + 1;
+          }
+        });
+
+        const labels = Object.keys(conteoCP);
+        const valores = Object.values(conteoCP);
+
+        const ctx = document.getElementById("myChart").getContext("2d");
+
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Ciudadanos por Código Postal",
+              data: valores,
+              backgroundColor: "rgba(54, 162, 235, 0.6)"
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              }
             }
           }
-        }
-      }
-    });
+        });
 
-  })
-  .catch(err => console.error("Error:", err));
-</script>
+      })
+      .catch(err => console.error("Error:", err));
+  </script>
+
+</body>
+</html>
