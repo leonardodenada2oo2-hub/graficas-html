@@ -1,80 +1,50 @@
 <!DOCTYPE html>
-<html lang="es">
+<script>
+const URL_DATOS = "https://script.google.com/macros/s/AKfycbzXlQrv975JiOA6J5-wsxQs-UkHRAwNxIqdC8tvnADvvRxCYAi8USOVCct9jOJxPi2ZiQ/exec";
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gráfica dinámica en HTML</title>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
+fetch(URL_DATOS)
+  .then(res => res.json())
+  .then(data => {
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            max-width: 700px;
-            margin: auto;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
+    // 1️⃣ Contar ciudadanos por código postal
+    const conteoCP = {};
 
-        button {
-            margin-top: 15px;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-    </style>
-</head>
+    data.forEach(item => {
+      const cp = item.CODIGO_POSTAL_CIUDADANO;
+      if (cp) {
+        conteoCP[cp] = (conteoCP[cp] || 0) + 1;
+      }
+    });
 
-<body>
+    // 2️⃣ Preparar datos para la gráfica
+    const labels = Object.keys(conteoCP);
+    const valores = Object.values(conteoCP);
 
-    <div class="card">
-        <h2>Ventas mensuales (gráfica dinámica)</h2>
-        <canvas id="myChart"></canvas>
-        <button onclick="actualizarDatos()">Actualizar datos</button>
-    </div>
+    const ctx = document.getElementById("myChart").getContext("2d");
 
-    <script>
-        const ctx = document.getElementById('myChart').getContext('2d');
-
-        let chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'],
-                datasets: [{
-                    label: 'Ventas ($)',
-                    data: [1200, 1900, 3000, 2500, 2200],
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Ciudadanos por Código Postal",
+          data: valores,
+          backgroundColor: "rgba(54, 162, 235, 0.6)"
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
             }
-        });
-
-        function actualizarDatos() {
-            // Genera datos aleatorios
-            chart.data.datasets[0].data = chart.data.datasets[0].data.map(
-                () => Math.floor(Math.random() * 4000) + 500
-            );
-            chart.update();
+          }
         }
-    </script>
+      }
+    });
 
-</body>
-
-
-</html>
+  })
+  .catch(err => console.error("Error:", err));
+</script>
