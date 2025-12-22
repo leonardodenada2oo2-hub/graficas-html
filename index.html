@@ -35,7 +35,11 @@
 
     fetch(URL_DATOS)
       .then(res => res.json())
-      .then(data => {
+      .then(data => { 
+        
+        document.getElementById("debug").textContent =
+  JSON.stringify(data.slice(0, 5), null, 2);
+
 
         const conteoCP = {};
 
@@ -80,3 +84,4 @@
 
 </body>
 </html>
+
